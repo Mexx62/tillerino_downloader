@@ -31,6 +31,8 @@ try:
     user = user.replace(' #separated like user1;user2', '')
     user = user.split(';')
     only_download_from_pm = config.get('Settings', 'only-download-from-pm')
+    channels_to_join = config.get('Settings', 'channels-to-join')
+    channels_to_join = channels_to_join.split(';')
 except ConfigParser.NoSectionError:
     config.add_section('Settings')
     config.add_section('Infos')
@@ -42,6 +44,7 @@ except ConfigParser.NoSectionError:
     config.set('Settings', 'download-video', '0')
     config.set('Settings', 'user-download-from-pm', 'Tillerino #separated like user1;user2')
     config.set('Settings', 'only-download-from-pm', '1')
+    config.set('Settings', 'channels-to-join', 'announce;osu;multiplayer;videogames;spectator;modhelp;modreqs')
     config.set('Infos', 'path_to_osu', 'C:\\path\\to\\osu!\\Songs\\')
     config.set('Infos', 'copy_path', 'D:\\osz\\backup\\folder\\')
     config.set('Infos', 'username', '')
@@ -219,7 +222,7 @@ class Bot(ircbot.SingleServerIRCBot):
                     with open(path + id[0] + '.osz', 'wb') as beatmap:
                         beatmap.write(data)
                     if data == "* File not found or inaccessible!":
-                        print("Filenot found on Bloodcat, i'm giving up")
+                        print("File not found on Bloodcat, i'm giving up")
                 with zipfile.ZipFile(path + id[0] + '.osz', 'r') as zf:
                     for file in zf.namelist():
                         test = re.findall('(.+?)\([^\(]+?\) \[.+?\].osu', file)
@@ -412,28 +415,9 @@ class Bot(ircbot.SingleServerIRCBot):
                     sound.play()
 
     def on_welcome(self, serv, ev):
-        serv.join('#announce')
-        print 'you have joined #announce'
-        serv.join('#osu')
-        print 'you have joined #osu'
-        serv.join('#taiko')
-        print 'you have joined #taiko'
-        serv.join('#mania')
-        print 'you have joined #mania'
-        serv.join('#ctb')
-        print 'you have joined #ctb'
-        serv.join('#multiplayer')
-        print 'you have joined #multiplayer'
-        serv.join('#videogames')
-        print 'you have joined #videogames'
-        serv.join('#spectator')
-        print 'you have joined #spectator'
-        serv.join('#modhelp')
-        print 'you have joined #modhelp'
-        serv.join('#modreqs')
-        print 'you have joined #modreqs'
-        serv.join('#help')
-        print 'you have joined #help'
+        for channel in channels_to_join:
+            serv.join('#' + channel)
+            print 'You have joined #' + channel
 
 
 if __name__ == "__main__":
